@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Center Paragraph</title>
+    <style>
+        html 
+        {
+            background-color: black;
+            height: 200%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            text-align: center;
+            scroll-behavior: smooth;
+        }
+        .empty 
+        {
+            width: 500px;
+            height: 400px;
+        }
+        .container {
+            font-size: 100px;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            position: relative;
+        }
+        .word {
+            opacity: 0;
+            font-weight: 100;
+            color: white;
+            transform: translateY(50px);
+            display: inline-block;
+            transition: opacity 1s, transform 1s;
+        }
+        .word.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .strikethrough {
+            position: relative;
+            display: inline-block;
+        }
+        .strikethrough::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 40%;
+            border-bottom: 4px solid yellow;
+            transition: width 1s;
+            width: 0;
+        }
+        .strikethrough.add-strike::after {
+            width: 100%;
+        }
+        .replacement {
+            display: inline-block;
+            font-family: "Shadows Into Light", cursive;
+            position: relative;
+            top: 20px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: top 1s, opacity 1s, transform 1s;
+            color: yellow;
+        }
+        .replacement.show {
+            top: -20px;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .caret {
+            display: inline-block;
+            font-family: "Shadows Into Light", cursive;
+            position: relative;
+            bottom: -20px;
+            font-size: 40px;
+            color: yellow;
+            opacity: 0;
+            vertical-align: bottom;
+            transition: opacity 1s;
+        }
+        .caret.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="empty"></div>
+    <div class="container">
+        <div class="line" id="line1">
+            <span class="word">Digital</span>
+            <span class="word">Solutions</span>
+            <span class="word">for</span>
+        </div>
+        <div class="line" id="line2">
+            <span class="word">Forward</span>
+            <span class="word">Thinking</span>
+        </div>
+        <div class="line" id="line3">
+            <span class="word highlight strikethrough" id="companies">Companies</span>
+            <span class="caret" id="caret">^</span>
+            <span class="word replacement" id="people">People</span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.5
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const words = document.querySelectorAll('.word');
+                        
+                        words.forEach((word, index) => {
+                            setTimeout(() => {
+                                word.classList.add('revealed');
+                                if (index === words.length - 1) {
+                                    const companiesSpan = document.getElementById('companies');
+                                    const caret = document.getElementById('caret');
+                                    const peopleSpan = document.getElementById('people');
+                                    
+                                    companiesSpan.classList.add('highlight');
+
+                                    setTimeout(() => {
+                                        companiesSpan.classList.add('add-strike');
+                                        companiesSpan.classList.remove('highlight');
+                                        
+                                        setTimeout(() => {
+                                            caret.classList.add('show');
+                                            peopleSpan.classList.add('show');
+                                        }, 500); // Delay for showing caret and people after strikethrough is complete
+                                    }, 1000); // Delay for strikethrough effect to start
+                                }
+                            }, index * 500); // Delay for each word to appear sequentially
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            const target = document.querySelector('.container');
+            observer.observe(target);
+        });
+    </script>
+</body>
+</html>
